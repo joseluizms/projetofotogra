@@ -1,7 +1,8 @@
-import { useState, useEffect, useContext } from 'react'
+import { useState, useEffect, useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 
-import { Photo } from '../../models/Photo'
-import { PhotoService } from '../../service/PhotoService'
+import { Photo } from '../../models/Photo';
+import { PhotoService } from '../../service/PhotoService';
 import {
   Container,
   CriteriaOptionButton,
@@ -15,15 +16,16 @@ import {
   ResultsArea,
   SearchArea,
   SearchButton,
-} from './styles'
-import loadingGif from '../../assets/img/loading.gif'
-import PhotoCard from '../../components/PhotoCard'
-import { UserContext } from '../../context/UserContext'
+} from './styles';
+import loadingGif from '../../assets/img/loading.gif';
+import PhotoCard from '../../components/PhotoCard';
+import { UserContext } from '../../context/UserContext';
 
 const Home = () => {
-  const [loading, isLoading] = useState(false)
+  const { t } = useTranslation();
+  const [loading, isLoading] = useState(false);
 
-  const photoService = new PhotoService()
+  const photoService = new PhotoService();
 
   const {
     query,
@@ -38,59 +40,55 @@ const Home = () => {
     setPerPage,
     totalPages,
     setTotalPages,
-  } = useContext(UserContext)
+  } = useContext(UserContext);
 
   const searchPhotos = async () => {
-    isLoading(true)
-    setPhotos([])
-    setTotalPages(0)
+    isLoading(true);
+    setPhotos([]);
+    setTotalPages(0);
     const photosFound = await photoService.findPhotos(
       query,
       page,
       perPage,
       criteria
-    )
-    setPhotos(photosFound.photos)
-    setTotalPages(photosFound.totalPages)
-    isLoading(false)
-  }
+    );
+    setPhotos(photosFound.photos);
+    setTotalPages(photosFound.totalPages);
+    isLoading(false);
+  };
 
   useEffect(() => {
-    searchPhotos()
-  }, [page])
+    searchPhotos();
+  }, [page]);
 
   return (
     <Container>
       <SearchArea>
         <FilterInput
-          placeholder='Digite o termo da busca'
+          placeholder={t('Digite o termo da busca')}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
 
         <CriteriaPanel>
           <CriteriaOptionButton
-            checked={criteria == 'relevant'}
-            onChange={(e) =>
-              setCriteria(e.target.checked ? 'relevant' : 'latest')
-            }
+            checked={criteria === 'relevant'}
+            onChange={(e) => setCriteria(e.target.checked ? 'relevant' : 'latest')}
           />
-          <CriteriaOptionLabel>Mais relevantes</CriteriaOptionLabel>
+          <CriteriaOptionLabel>{t('Mais relevantes')}</CriteriaOptionLabel>
 
           <CriteriaOptionButton
-            checked={criteria == 'latest'}
-            onChange={(e) =>
-              setCriteria(e.target.checked ? 'latest' : 'relevant')
-            }
+            checked={criteria === 'latest'}
+            onChange={(e) => setCriteria(e.target.checked ? 'latest' : 'relevant')}
           />
-          <CriteriaOptionLabel>Mais recentes</CriteriaOptionLabel>
+          <CriteriaOptionLabel>{t('Mais recentes')}</CriteriaOptionLabel>
         </CriteriaPanel>
 
-        <SearchButton onClick={() => searchPhotos()}>Buscar</SearchButton>
+        <SearchButton onClick={() => searchPhotos()}>{t('Buscar')}</SearchButton>
       </SearchArea>
 
       <ResultsArea>
-        {loading && <Loading src={loadingGif} alt='Carregando resultados' />}
+        {loading && <Loading src={loadingGif} alt={t('Carregando resultados')} />}
 
         {photos.length > 0 &&
           photos.map((p) => <PhotoCard key={p.id} photo={p} />)}
@@ -105,7 +103,7 @@ const Home = () => {
           )}
 
           <CurrentPage>
-            Página {page} de {totalPages}
+            {t('Página')} {page} {t('de')} {totalPages}
           </CurrentPage>
 
           {page < totalPages && (
@@ -116,7 +114,7 @@ const Home = () => {
         </NavigationArea>
       )}
     </Container>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;
